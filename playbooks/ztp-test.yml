@@ -1,0 +1,30 @@
+---
+# Test playbook for ZTP Day 2 Automation
+
+- name: "Test ZTP day2 playbook"
+  hosts: localhost
+  connection: local
+  tasks:
+
+  # - ansible.builtin.debug:
+  #     msg: "Host Variables: {{ hostvars[{{ inventory_hostname }}] }}"
+  # - ansible.builtin.debug:
+  #     msg: "Number of body elements: {{ ansible_eda.event.body | length }}"
+  #   when: ansible_eda is defined
+  # - ansible.builtin.debug:
+  #     msg: "ansible_eda.event.body: {{ item }}"
+  #   when: ansible_eda is defined
+  #   loop: "{{ ansible_eda.event.body }}"
+
+  - name: Process CguSuccess TALM events for SNO ZTP day2 automation
+    ansible.builtin.include_tasks: tasks/process_cluster_events_kubeconfig.yaml
+    loop: "{{ ansible_eda.event.body }}"
+    loop_control:
+      label: "{{ item.cguName | default('invalid-event') }}"
+    when:
+    - item.eventAnnotations is defined
+    - item.eventAnnotations['cgu.openshift.io/event-type'] == "cluster"
+    - item.eventAnnotations['cgu.openshift.io/cluster-name'] is defined
+    - item.eventAnnotations['cgu.openshift.io/cluster-name'] == item.cguName
+    - item.eventNamespace == "ztp-install"
+    - item.reason == "CguSuccess"
