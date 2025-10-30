@@ -3,6 +3,7 @@
 
 - name: Read messages from a kafka topic from MCGH
   hosts: all
+  execution_strategy: parallel
   sources:
   - ansible.eda.kafka:
       host: "{{ HOST }}"
