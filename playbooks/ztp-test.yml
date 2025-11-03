@@ -4,6 +4,8 @@
 - name: "Test ZTP day2 playbook"
   hosts: localhost
   connection: local
+  vars:
+    kubeconfig_output_path: /tmp/target_kubeconfig
   tasks:
 
   # - ansible.builtin.debug:
