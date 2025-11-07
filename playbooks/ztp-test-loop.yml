@@ -1,7 +1,7 @@
 ---
 # Test playbook for ZTP Day 2 Automation
 
-- name: "Test ZTP day2 playbook"
+- name: "Test ZTP day2 playbook (loop)"
   hosts: localhost
   connection: local
   vars:
@@ -18,7 +18,7 @@
   #   when: ansible_eda is defined
   #   loop: "{{ ansible_eda.event.body }}"
 
-  - name: Process CguSuccess TALM events for SNO ZTP day2 automation
+  - name: Process CguSuccess TALM events for Cluster ZTP day2 automation
     ansible.builtin.include_tasks: tasks/process_cluster_events_kubeconfig.yaml
     loop: "{{ ansible_eda.event.body }}"
     loop_control:

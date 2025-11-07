@@ -5,16 +5,16 @@
   ansible.builtin.debug:
     msg: |
       TALM event received at {{ ansible_date_time.iso8601 }}:
-      Cluster {{ item.cguName }} managed by {{ item.leafHubName }} hub SUCCEEDED.
+      Cluster {{ inventory_hostname }} managed by {{ leafHubName }} hub SUCCEEDED.
       Cluster is ready for workloads.
 
-- name: "Create ztp-ansible=running label for cluster {{ item.cguName }}"
+- name: "Create ztp-ansible=running label for cluster {{ inventory_hostname }}"
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig }}"
     state: patched
     api_version: cluster.open-cluster-management.io/v1
     kind: ManagedCluster
-    name: "{{ item.cguName }}"
+    name: "{{ inventory_hostname }}"
     definition:
       metadata:
         labels:
@@ -25,13 +25,13 @@
     kubeconfig: "{{ kubeconfig }}"
     api_version: v1
     kind: Secret
-    name: "{{ item.cguName }}-admin-kubeconfig"
-    namespace: "{{ item.cguName }}"
+    name: "{{ inventory_hostname }}-admin-kubeconfig"
+    namespace: "{{ inventory_hostname }}"
   register: kubeconfig_secret_result
 
 - name: Validate kubeconfig secret exists
   ansible.builtin.fail:
-    msg: "Kubeconfig secret for cluster {{ item.cguName }} not found or missing 'kubeconfig' key"
+    msg: "Kubeconfig secret for cluster {{ inventory_hostname }} not found or missing 'kubeconfig' key"
   when:
     - kubeconfig_secret_result.resources | default([]) | length == 0 or
       not (kubeconfig_secret_result.resources[0].data | default({})).kubeconfig is defined
@@ -64,13 +64,13 @@
   ansible.builtin.wait_for:
     timeout: 60
 
-- name: "Create ztp-ansible=completed label for cluster {{ item.cguName }}"
+- name: "Create ztp-ansible=completed label for cluster {{ inventory_hostname }}"
   kubernetes.core.k8s:
     kubeconfig: "{{ kubeconfig }}"
     state: patched
     api_version: cluster.open-cluster-management.io/v1
     kind: ManagedCluster
-    name: "{{ item.cguName }}"
+    name: "{{ inventory_hostname }}"
     definition:
       metadata:
         labels:
