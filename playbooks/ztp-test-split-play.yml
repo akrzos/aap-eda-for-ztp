@@ -27,11 +27,13 @@
       label: "{{ item.cguName | default('invalid-event') }}"
     when:
     - item.eventAnnotations is defined
+    - item.reason == "CguSuccess"
+    - "{{ 'cgu.openshift.io/event-type' in item.eventAnnotations }}"
     - item.eventAnnotations['cgu.openshift.io/event-type'] == "cluster"
+    - "{{ 'cgu.openshift.io/cluster-name' in item.eventAnnotations }}"
     - item.eventAnnotations['cgu.openshift.io/cluster-name'] is defined
     - item.eventAnnotations['cgu.openshift.io/cluster-name'] == item.cguName
     - item.eventNamespace == "ztp-install"
-    - item.reason == "CguSuccess"
 
 - name: Apply tasks per cluster
   hosts: target_clusters
@@ -41,4 +43,3 @@
     ansible.builtin.include_tasks: tasks/day2-tasks-concurrent.yml
     vars:
       kubeconfig_output_path: "/tmp/{{ inventory_hostname }}-kubeconfig"
-
