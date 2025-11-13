@@ -25,10 +25,7 @@
       label: "{{ item.cguName | default('invalid-event') }}"
     when:
     - item.eventAnnotations is defined
+    - item.eventAnnotations.get('cgu.openshift.io/event-type') == "cluster"
+    - item.eventAnnotations.get('cgu.openshift.io/cluster-name') == item.cguName
     - item.reason == "CguSuccess"
-    - "{{ 'cgu.openshift.io/event-type' in item.eventAnnotations }}"
-    - item.eventAnnotations['cgu.openshift.io/event-type'] == "cluster"
-    - "{{ 'cgu.openshift.io/cluster-name' in item.eventAnnotations }}"
-    - item.eventAnnotations['cgu.openshift.io/cluster-name'] is defined
-    - item.eventAnnotations['cgu.openshift.io/cluster-name'] == item.cguName
     - item.eventNamespace == "ztp-install"
